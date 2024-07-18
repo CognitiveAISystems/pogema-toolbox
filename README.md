@@ -44,7 +44,7 @@ A more complex example is an algorithm with tunable hyperparameters. Here is an 
 ToolboxRegistry.register_algorithm('Follower', FollowerInference, FollowerInferenceConfig,
                                        follower_preprocessor)
 ```
-For the full evaluation code, please refer to [example of Follower](https://github.com/AIRI-Institute/learn-to-follow/blob/pogema-toolbox/eval.py)
+For the full evaluation code example, please refer to [Follower repository](https://github.com/AIRI-Institute/learn-to-follow/blob/main/eval.py)
 
 ### Register custom maps
 
