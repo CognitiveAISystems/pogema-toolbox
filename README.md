@@ -118,3 +118,17 @@ results_views: # Defining results visualization
 
 The configuration is split into three main sections. The first one details the parameters of the POGEMA environment used for testing. It also includes iteration over the number of agents, seeds, and names of the maps (which were registered beforehand). The unified `grid_search` tag allows for the examination of any existing parameter of the environment. The second part of the configuration is a list of algorithms to be tested. Each algorithm has its alias (which will be shown in the results) and name, which specifies the family of methods. It also includes a list of hyperparameters common to different approaches, e.g., number of processes, parallel backend, etc., and the specific parameters of the algorithm.
 
+
+## Citation
+If you use this repository in your research or wish to cite it, please make a reference to our paper: 
+```
+@misc{skrynnik2024pogema,
+      title={POGEMA: A Benchmark Platform for Cooperative Multi-Agent Navigation}, 
+      author={Alexey Skrynnik and Anton Andreychuk and Anatolii Borzilov and Alexander Chernyavskiy and Konstantin Yakovlev and Aleksandr Panov},
+      year={2024},
+      eprint={2407.14931},
+      archivePrefix={arXiv},
+      primaryClass={cs.LG},
+      url={https://arxiv.org/abs/2407.14931}, 
+}
+```
