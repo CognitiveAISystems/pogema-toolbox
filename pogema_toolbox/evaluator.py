@@ -15,33 +15,8 @@ from pogema_toolbox.registry import ToolboxRegistry
 from pogema_toolbox.views.view_multi_plot import process_multi_plot_view, MultiPlotView
 from pogema_toolbox.views.view_plot import process_plot_view, PlotView
 from pogema_toolbox.views.view_tabular import process_table_view, TabularView
-from pogema_toolbox.results_holder import ResultsHolder
 
 from concurrent.futures import ProcessPoolExecutor
-
-
-def run_episode(env, algo):
-    """
-    Runs an episode in the environment using the given algorithm.
-
-    Args:
-        env: The environment to run the episode in.
-        algo: The algorithm used for action selection.
-
-    Returns:
-        ResultsHolder: Object containing the results of the episode.
-    """
-    algo.reset_states()
-    results_holder = ResultsHolder()
-
-    obs, _ = env.reset(seed=env.grid_config.seed)
-    while True:
-        obs, rew, terminated, truncated, infos = env.step(algo.act(obs))
-        results_holder.after_step(infos)
-
-        if all(terminated) or all(truncated):
-            break
-    return results_holder.get_final()
 
 
 def sequential_backend(algo_config, env_configs, full_algo_name, registry_state=None):
@@ -71,7 +46,7 @@ def sequential_backend(algo_config, env_configs, full_algo_name, registry_state=
         if algo_cfg.preprocessing:
             ToolboxRegistry.debug('Adding preprocessing')
             env = registry.create_algorithm_preprocessing(env, algo_name, **algo_config)
-        results.append(run_episode(env, algo))
+        results.append(registry.run_episode(env, algo, algo_cfg.run_episode))
 
         if env_config.get('with_animation', None):
             from pathlib import Path
