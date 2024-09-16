@@ -9,6 +9,7 @@ class AlgoBase(BaseModel):
     num_process: int = 3
     device: str = 'cuda'
     parallel_backend: Literal['dask', 'sequential', 'balanced_dask', 'balanced_multiprocessing', 'multiprocessing'] = 'balanced_dask'
+    run_episode: str = 'default'
 
     seed: Optional[int] = 0
     preprocessing: Optional[str] = None

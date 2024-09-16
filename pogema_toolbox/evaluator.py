@@ -46,7 +46,7 @@ def sequential_backend(algo_config, env_configs, full_algo_name, registry_state=
         if algo_cfg.preprocessing:
             ToolboxRegistry.debug('Adding preprocessing')
             env = registry.create_algorithm_preprocessing(env, algo_name, **algo_config)
-        results.append(registry.run_episode(env, algo))
+        results.append(registry.run_episode(env, algo, algo_cfg.run_episode))
 
         if env_config.get('with_animation', None):
             from pathlib import Path
