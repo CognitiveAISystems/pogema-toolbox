@@ -4,6 +4,7 @@ import sys
 from loguru import logger as base_logger
 
 from pogema_toolbox.algorithm_config import AlgoBase
+from pogema_toolbox.run_episode import run_episode
 
 
 class ToolboxRegistry:
@@ -13,6 +14,7 @@ class ToolboxRegistry:
     _envs = {}
     _logger = None
     _logger_config = {'level': 'INFO', 'sink': sys.stderr}
+    _run_episode = {'default': run_episode}
 
     # ----- Logging section -----
     @classmethod
@@ -62,7 +64,8 @@ class ToolboxRegistry:
             'maps': cls._maps,
             'algorithms': cls._algorithms,
             'envs': cls._envs,
-            'logger_config': cls._logger_config
+            'logger_config': cls._logger_config,
+            'run_episode': cls._run_episode,
         }
 
     @classmethod
@@ -158,3 +161,16 @@ class ToolboxRegistry:
                 except yaml.YAMLError as exc:
                     cls.error(f'Error loading YAML file {yaml_file_path}: {exc}')
         cls.debug(f'Registered {len(cls._maps)} maps')
+    
+    # ----- Run episode section -----
+    @classmethod
+    def register_run_episode(cls, name, run_func):
+        if name in cls._run_episode:
+            cls._logger.warning(f'Registering existing run_episode function with name {name}')
+        cls._run_episode[name] = run_func
+        cls.debug(f'Registered run_episode function with name {name}')
+    
+    @classmethod
+    def run_episode(cls, env, algo, run_episode_name='default'):
+        run_episode_func = cls._run_episode[run_episode_name]
+        return run_episode_func(env, algo)
