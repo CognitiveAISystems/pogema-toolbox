@@ -14,7 +14,7 @@ class ToolboxRegistry:
     _envs = {}
     _logger = None
     _logger_config = {'level': 'INFO', 'sink': sys.stderr}
-    _run_episode = {'default': run_episode}
+    _run_episode_funcs = {'default': run_episode}
 
     # ----- Logging section -----
     @classmethod
@@ -65,7 +65,7 @@ class ToolboxRegistry:
             'algorithms': cls._algorithms,
             'envs': cls._envs,
             'logger_config': cls._logger_config,
-            'run_episode': cls._run_episode,
+            'run_episode': cls._run_episode_funcs,
         }
 
     @classmethod
@@ -73,7 +73,7 @@ class ToolboxRegistry:
         cls._maps = state.get('maps', {})
         cls._algorithms = state.get('algorithms', {})
         cls._envs = state.get('envs', {})
-        cls._run_episode = state.get("run_episode", {})
+        cls._run_episode_funcs = state.get("run_episode", {})
         logger_config = state.get('logger_config', {})
         if logger_config:
             cls.setup_logger(level=logger_config.get('level', 'INFO'), sink=logger_config.get('sink', sys.stderr))
@@ -165,13 +165,13 @@ class ToolboxRegistry:
     
     # ----- Run episode section -----
     @classmethod
-    def register_run_episode(cls, name, run_func):
-        if name in cls._run_episode:
+    def register_run_func(cls, name, run_func):
+        if name in cls._run_episode_funcs:
             cls._logger.warning(f'Registering existing run_episode function with name {name}')
-        cls._run_episode[name] = run_func
+        cls._run_episode_funcs[name] = run_func
         cls.debug(f'Registered run_episode function with name {name}')
     
     @classmethod
-    def run_episode(cls, env, algo, run_episode_name='default'):
-        run_episode_func = cls._run_episode[run_episode_name]
+    def run_episode(cls, env, algo, run_func_name='default'):
+        run_episode_func = cls._run_episode_funcs[run_func_name]
         return run_episode_func(env, algo)
