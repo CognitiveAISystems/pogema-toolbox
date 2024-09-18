@@ -73,6 +73,7 @@ class ToolboxRegistry:
         cls._maps = state.get('maps', {})
         cls._algorithms = state.get('algorithms', {})
         cls._envs = state.get('envs', {})
+        cls._run_episode = state.get("run_episode", {})
         logger_config = state.get('logger_config', {})
         if logger_config:
             cls.setup_logger(level=logger_config.get('level', 'INFO'), sink=logger_config.get('sink', sys.stderr))
