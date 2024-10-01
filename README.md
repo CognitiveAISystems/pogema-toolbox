@@ -1,9 +1,5 @@
 # POGEMA Toolbox
 
-[![Downloads](https://static.pepy.tech/badge/pogema-toolbox)](https://pepy.tech/project/pogema-toolbox)
-[<img src="https://img.shields.io/badge/license-Apache_2.0-blue">](https://github.com/tinkoff-ai/CORL/blob/main/LICENSE)
-![PyPI](https://img.shields.io/pypi/v/pogema-toolbox?color=blue)
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1XcLr-EmcgctKta3H1-zac_mnPqmG4Xxj?usp=sharing)
 
 ## Overview 
 
@@ -18,7 +14,7 @@ The POGEMA Toolbox is a comprehensive framework designed to facilitate the testi
 Just install from PyPI:
 
 ```bash
-pip install pogema-toolbox
+python setup install 
 ```
 
 ## Features
@@ -44,7 +40,6 @@ A more complex example is an algorithm with tunable hyperparameters. Here is an 
 ToolboxRegistry.register_algorithm('Follower', FollowerInference, FollowerInferenceConfig,
                                        follower_preprocessor)
 ```
-For the full evaluation code example, please refer to [Follower repository](https://github.com/AIRI-Institute/learn-to-follow/blob/main/eval.py)
 
 ### Register custom maps
 
@@ -117,18 +112,3 @@ results_views: # Defining results visualization
 ```
 
 The configuration is split into three main sections. The first one details the parameters of the POGEMA environment used for testing. It also includes iteration over the number of agents, seeds, and names of the maps (which were registered beforehand). The unified `grid_search` tag allows for the examination of any existing parameter of the environment. The second part of the configuration is a list of algorithms to be tested. Each algorithm has its alias (which will be shown in the results) and name, which specifies the family of methods. It also includes a list of hyperparameters common to different approaches, e.g., number of processes, parallel backend, etc., and the specific parameters of the algorithm.
-
-
-## Citation
-If you use this repository in your research or wish to cite it, please make a reference to our paper: 
-```
-@misc{skrynnik2024pogema,
-      title={POGEMA: A Benchmark Platform for Cooperative Multi-Agent Navigation}, 
-      author={Alexey Skrynnik and Anton Andreychuk and Anatolii Borzilov and Alexander Chernyavskiy and Konstantin Yakovlev and Aleksandr Panov},
-      year={2024},
-      eprint={2407.14931},
-      archivePrefix={arXiv},
-      primaryClass={cs.LG},
-      url={https://arxiv.org/abs/2407.14931}, 
-}
-```
