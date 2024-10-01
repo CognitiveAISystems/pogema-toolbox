@@ -31,13 +31,12 @@ def find_version(*file_paths):
 
 setup(
     name='pogema-toolbox',
-    author='Alexey Skrynnik',
+    author='ICLR-7439',
     license='Apache License 2.0',
     version=find_version("pogema_toolbox", "__init__.py"),
     description='Evaluation toolbox for Pogema environment',
     long_description=long_description,
     long_description_content_type='text/markdown',
-    url='https://github.com/Tviskaron/pogema-toolbox',
     install_requires=[
         "loguru<=0.7.2",
         "wandb>=0.12.9,<=0.13.4",
