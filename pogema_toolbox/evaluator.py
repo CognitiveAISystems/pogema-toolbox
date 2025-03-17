@@ -1,3 +1,5 @@
+from copy import deepcopy
+
 # noinspection PyUnresolvedReferences
 from pogema_toolbox import fix_num_threads_issue
 
@@ -333,7 +335,22 @@ def evaluation(evaluation_config, eval_dir=None):
     Returns:
         List: Results of the evaluation.
     """
-    env_grid_search, environment_configs = zip(*generate_variants(evaluation_config['environment']))
+
+    if 'scenarios' in evaluation_config:
+        configs_changes = []
+        env_configs = []
+        for cfg_changes, env_cfg in generate_variants(evaluation_config['environment']):
+            for scenario_name, scenario_value in evaluation_config['scenarios'].items():
+                current_cfg_changes = deepcopy(cfg_changes)
+                current_cfg = deepcopy(env_cfg)
+
+                current_cfg_changes[('Scenario',)] = scenario_name
+                current_cfg.update(**scenario_value)
+
+                configs_changes.append(current_cfg_changes)
+                env_configs.append(current_cfg)
+    else:
+        configs_changes, env_configs = zip(*generate_variants(evaluation_config['environment']))
 
     results = []
     for key, algo_cfg in evaluation_config['algorithms'].items():
@@ -341,18 +358,18 @@ def evaluation(evaluation_config, eval_dir=None):
         ToolboxRegistry.info(f'Starting: {key}, {algo_cfg}')
         start_time = time.monotonic()
         if p_algo_cfg.parallel_backend == 'sequential':
-            metrics = sequential_backend(algo_cfg, environment_configs, key)
+            metrics = sequential_backend(algo_cfg, env_configs, key)
         elif p_algo_cfg.parallel_backend == 'multiprocessing':
-            metrics = multiprocess_backend(algo_cfg, environment_configs, key)
+            metrics = multiprocess_backend(algo_cfg, env_configs, key)
         elif p_algo_cfg.parallel_backend == 'dask':
-            metrics = dask_backend(algo_cfg, environment_configs, key)
+            metrics = dask_backend(algo_cfg, env_configs, key)
         elif p_algo_cfg.parallel_backend == 'balanced_multiprocessing':
-            metrics = balanced_multiprocess_backend(algo_cfg, environment_configs, key)
+            metrics = balanced_multiprocess_backend(algo_cfg, env_configs, key)
         elif p_algo_cfg.parallel_backend == 'balanced_dask':
-            metrics = balanced_dask_backend(algo_cfg, environment_configs, key)
+            metrics = balanced_dask_backend(algo_cfg, env_configs, key)
         else:
             raise ValueError(f'Unknown parallel backend: {p_algo_cfg.parallel_backend}')
-        algo_results = join_metrics_and_configs(metrics, environment_configs, env_grid_search, algo_cfg, key)
+        algo_results = join_metrics_and_configs(metrics, env_configs, configs_changes, algo_cfg, key)
         if eval_dir:
             save_path = Path(eval_dir) / f'{key}.json'
             save_path.parent.mkdir(parents=True, exist_ok=True)

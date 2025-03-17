@@ -1,8 +1,38 @@
+from pogema import pogema_v0
+
+from pogema_toolbox.registry import ToolboxRegistry
 import shutil
 import tempfile
+import yaml
 
 from pathlib import Path
 import wandb
+
+
+def seeded_configs_to_scenarios_converter(env_configs):
+    scenarios = {}
+
+    for idx, cfg in enumerate(env_configs):
+        env: pogema_v0 = ToolboxRegistry.create_env(env_name=cfg['name'], **cfg)
+        env.reset()
+        scenario = {'agents_xy': env.get_agents_xy(ignore_borders=True),
+                    'targets_xy': env.get_targets_xy(ignore_borders=True),
+                    'map_name': env.grid_config.map_name}
+        scenario_name = f'Scenario-{str(idx).zfill(len(str(len(env_configs))))}'
+
+        scenarios[scenario_name] = scenario
+
+    return scenarios
+
+def scenarios_to_yaml(scenarios):
+    class FlowStyleDumper(yaml.Dumper):
+        def represent_sequence(self, tag, sequence, flow_style=None):
+            if isinstance(sequence, list) and all(isinstance(i, list) for i in sequence):
+                flow_style = True  # Use flow style for lists of lists
+            return super().represent_sequence(tag, sequence, flow_style)
+
+    yaml_str = yaml.dump(scenarios, Dumper=FlowStyleDumper, default_flow_style=None, width=256)
+    return yaml_str
 
 
 def initialize_wandb(evaluation_config, eval_dir, disable_wandb, project_name):
