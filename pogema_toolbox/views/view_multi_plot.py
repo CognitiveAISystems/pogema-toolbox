@@ -12,10 +12,12 @@ from typing import Literal
 class MultiPlotView(PlotView):
     type: Literal['multi-plot'] = 'multi-plot'
     over: str = None
+    sort_over: bool = True
     num_cols: int = 3
     share_x: bool = False
     share_y: bool = False
     remove_individual_titles: bool = True
+    remove_individual_legends: bool = True
     legend_bbox_to_anchor: Tuple[float, float] = (0.5, -0.05)
     legend_loc: str = 'lower center'
     legend_columns: int = 5
@@ -35,7 +37,10 @@ def process_multi_plot_view(results, view: MultiPlotView, save_path=None):
     if view.rename_fields:
         df = df.rename(columns=view.rename_fields)
 
-    over_keys = sorted(df[view.over].unique())
+    if view.sort_over:
+        over_keys = sorted(df[view.over].unique())
+    else:
+        over_keys = df[view.over].unique()
     num_cols = view.num_cols
     num_rows = len(over_keys) // num_cols + (1 if len(over_keys) % num_cols else 0)
 
@@ -58,7 +63,7 @@ def process_multi_plot_view(results, view: MultiPlotView, save_path=None):
                          linewidth=view.line_width, hue_order=view.hue_order, style_order=view.hue_order)
         ax.set_title(over if not view.remove_individual_titles else '')
 
-        if view.remove_individual_titles:
+        if view.remove_individual_legends:
             legend = g.get_legend()
             if legend is not None:  # Check if the legend exists before removing
                 legend.remove()
