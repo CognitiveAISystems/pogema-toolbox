@@ -339,13 +339,38 @@ def evaluation(evaluation_config, eval_dir=None):
     if 'scenarios' in evaluation_config:
         configs_changes = []
         env_configs = []
-        for cfg_changes, env_cfg in generate_variants(evaluation_config['environment']):
+        maps = ToolboxRegistry.get_maps()
+        
+        modified_env_config = deepcopy(evaluation_config['environment'])
+        for key in ['seed', 'map_name']:
+            if key in modified_env_config and isinstance(modified_env_config[key], dict) and 'grid_search' in modified_env_config[key]:
+                modified_env_config.pop(key)
+        
+        for cfg_changes, env_cfg in generate_variants(modified_env_config):
             for scenario_name, scenario_value in evaluation_config['scenarios'].items():
                 current_cfg_changes = deepcopy(cfg_changes)
+                current_cfg_changes[('scenario',)] = scenario_name
+                if 'map_name' in scenario_value:
+                    current_cfg_changes[('map_name',)] = scenario_value['map_name']
+                if 'seed' in scenario_value:
+                    current_cfg_changes[('seed',)] = scenario_value['seed']
+                
                 current_cfg = deepcopy(env_cfg)
-
-                current_cfg_changes[('Scenario',)] = scenario_name
-                current_cfg.update(**scenario_value)
+                
+                scenario_copy = deepcopy(scenario_value)
+                if 'num_agents' in current_cfg:
+                    num_agents = current_cfg['num_agents']
+                    if num_agents < len(scenario_copy['agents_xy']):
+                        scenario_copy['agents_xy'] = scenario_copy['agents_xy'][:num_agents]
+                        scenario_copy['targets_xy'] = scenario_copy['targets_xy'][:num_agents]
+                current_cfg['num_agents'] = len(scenario_copy['agents_xy'])
+                
+                if scenario_value['map_name'] in maps:
+                    if scenario_value['map_name'] not in maps:
+                        ToolboxRegistry.error(f'Map {scenario_value["map_name"]} not found in registry')
+                    current_cfg['map'] = maps[scenario_value['map_name']]
+                
+                current_cfg.update(**scenario_copy)
 
                 configs_changes.append(current_cfg_changes)
                 env_configs.append(current_cfg)
