@@ -15,9 +15,27 @@ def seeded_configs_to_scenarios_converter(env_configs):
     for idx, cfg in enumerate(env_configs):
         env: pogema_v0 = ToolboxRegistry.create_env(env_name=cfg['name'], **cfg)
         env.reset()
-        scenario = {'agents_xy': env.get_agents_xy(ignore_borders=True),
-                    'targets_xy': env.get_targets_xy(ignore_borders=True),
-                    'map_name': env.grid_config.map_name}
+        if env.grid_config.on_target == 'restart':
+            targets_xy = env.get_lifelong_targets_xy(ignore_borders=True)
+        else:
+            targets_xy = env.get_targets_xy(ignore_borders=True)
+        agents_xy = env.get_agents_xy(ignore_borders=True)
+        if hasattr(agents_xy, 'tolist'):
+            agents_xy = agents_xy.tolist()
+        else:
+            agents_xy = [[int(x), int(y)] for x, y in agents_xy]
+            
+        if hasattr(targets_xy, 'tolist'):
+            targets_xy = targets_xy.tolist()
+        elif env.grid_config.on_target == 'restart':
+            targets_xy = [[[int(x), int(y)] for x, y in agent_targets] for agent_targets in targets_xy]
+        else:
+            targets_xy = [[int(x), int(y)] for x, y in targets_xy]
+            
+        scenario = {'agents_xy': agents_xy,
+                    'targets_xy': targets_xy,
+                    'map_name': env.grid_config.map_name,
+                    'seed': cfg.get('seed', env.grid_config.seed)}
         scenario_name = f'Scenario-{str(idx).zfill(len(str(len(env_configs))))}'
 
         scenarios[scenario_name] = scenario
